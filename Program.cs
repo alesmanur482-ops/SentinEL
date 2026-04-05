@@ -13,7 +13,7 @@ if (File.Exists(yol))
         parmakIzi = BitConverter.ToString(baytlar).Replace("-", "").ToLower();
     }
     Console.WriteLine("Kimlik No: " + parmakIzi);
-    string apiKey = "YOUR_API_KEY_HERE";
+    string apiKey = "BURAYA_KENDI_API_ANAHTARINIZI_YAZIN";
     string url = $"https://www.virustotal.com/api/v3/files/{parmakIzi}";
 
     using (HttpClient istemci = new HttpClient())
@@ -22,18 +22,43 @@ if (File.Exists(yol))
         Console.WriteLine("[İNTERNET] Sorgulanıyor...");
 
         var cevap = istemci.GetAsync(url).Result;
+if (cevap.IsSuccessStatusCode)
+{
+    string icerik = cevap.Content.ReadAsStringAsync().Result;
+    
+    using (var belge = System.Text.Json.JsonDocument.Parse(icerik))
+    {
+        var root = belge.RootElement;
+        var istatistik = root.GetProperty("data").GetProperty("attributes").GetProperty("last_analysis_stats");
 
-        if (cevap.IsSuccessStatusCode)
+        int kotu = istatistik.GetProperty("malicious").GetInt32();
+        int supheli = istatistik.GetProperty("suspicious").GetInt32();
+        int temiz = istatistik.GetProperty("harmless").GetInt32();
+
+        Console.WriteLine("\n---------- DETAYLI ANALİZ RAPORU ----------");
+        
+        if (kotu > 0)
         {
-            Console.WriteLine("✔ DOSYA VERİ TABANINDA VAR!");
-        } else
-        {
-            Console.WriteLine("[-] Dosya yeni veya bulunamadı.");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"!!! TEHLİKE: {kotu} adet antivirüs bu dosyayı ZARARLI buldu!");
         }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("✔ TEMİZ: Hiçbir antivirüs zararlı yazılım bulamadı.");
+        }
+
+        Console.ResetColor();
+        Console.WriteLine($"Şüpheli: {supheli} | Güvenli: {temiz}");
+        Console.WriteLine("-------------------------------------------");
     }
 }
-
 else
-{      
-    Console.WriteLine("\n[HATA] Dosya bulunamadı! Lütfen yolu kontrol edin.");
+{
+    Console.ForegroundColor = ConsoleColor.Yellow;
+    Console.WriteLine("\n[-] BİLGİ: Dosya yeni veya henüz analiz edilmemiş (0/70).");
+    Console.ResetColor();
 }
+ }
+    }
+      

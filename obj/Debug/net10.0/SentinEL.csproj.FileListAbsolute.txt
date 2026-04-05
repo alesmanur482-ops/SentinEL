@@ -26,3 +26,4 @@
 /Users/es/Desktop/SentinEL/obj/Debug/net10.0/SentinEL.pdb
 /Users/es/Desktop/SentinEL/obj/Debug/net10.0/SentinEL.genruntimeconfig.cache
 /Users/es/Desktop/SentinEL/obj/Debug/net10.0/ref/SentinEL.dll
+/Users/es/Desktop/SentinEL/obj/Debug/net10.0/SentinEL.sourcelink.json
